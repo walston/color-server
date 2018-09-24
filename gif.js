@@ -1,0 +1,37 @@
+module.exports = function Gif(r, g, b) {
+  const head = Buffer.from("GIF87a");
+  const size = Buffer.from([1, 0, 1, 0, 0xf0, 0, 0]);
+  const color = Buffer.from([r, g, b]);
+  const map = Buffer.from([
+    0x26,
+    0x45,
+    0xc9,
+    0x21,
+    0xf9,
+    0x04,
+    0x01,
+    0x00,
+    0x00,
+    0x01,
+    0x00,
+    0x2c,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x01,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x02,
+    0x02,
+    0x44,
+    0x01,
+    0x00,
+    0x3b
+  ]);
+
+
+  return Buffer.concat([head, size, color, map], 43);
+}
