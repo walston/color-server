@@ -11,20 +11,30 @@ app.use(ctx => {
   console.debug(ctx.request.path);
 
   const color = [rando(), rando(), rando()];
-  const path = /([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})\.gif$/.exec(
+  const path = /^\/([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})\.gif$/i.exec(
     ctx.request.path || ""
   );
+
   if (path != null) {
     const [, r, g, b] = path;
     color[0] = parseInt(r, 16);
     color[1] = parseInt(g, 16);
     color[2] = parseInt(b, 16);
-  }
 
-  return hold().then(() => {
-    ctx.response.headers = { "Content-Type": "image/gif" };
-    ctx.response.body = Gif(...color);
-  });
+    console.debug('Responding with GIF');
+    return hold().then(() => {
+      ctx.response.set("Content-Type", "image/gif");
+      ctx.response.body = Gif(...color);
+    });
+  } else {
+    const hex = color.map(x => x.toString(16));
+    const uri = `/${hex.join('')}.gif`;
+    ctx.response.status = 302;
+    ctx.response.set('Location', uri);
+
+    console.debug('Responding with 302:', uri);
+    return ctx.respond;
+  }
 });
 
 app.listen(PORT, () => {
